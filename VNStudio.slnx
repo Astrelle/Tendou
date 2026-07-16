@@ -1,0 +1,7 @@
+<Solution>
+  <Folder Name="/src/">
+    <Project Path="src/VNStudio.Creator/VNStudio.Creator.csproj" />
+    <Project Path="src/VNStudio.Engine/VNStudio.Engine.csproj" />
+    <Project Path="src/VNStudio.Shared/VNStudio.Shared.csproj" />
+  </Folder>
+</Solution>

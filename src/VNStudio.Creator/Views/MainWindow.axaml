@@ -1,0 +1,185 @@
+<Window xmlns="https://github.com/avaloniaui"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:vm="using:VNStudio.Creator.ViewModels"
+        x:Class="VNStudio.Creator.Views.MainWindow"
+        x:DataType="vm:MainViewModel"
+        Icon="/Assets/avalonia-logo.ico"
+        Title="{Binding WindowTitle}"
+        Width="1100" Height="700"
+        MinWidth="800" MinHeight="600"
+        WindowStartupLocation="CenterScreen">
+
+    <Window.Background>
+        <SolidColorBrush Color="#1e1e1e"/>
+    </Window.Background>
+
+    <Grid RowDefinitions="Auto, *">
+        <Menu Grid.Row="0" Background="#2d2d2d">
+            <MenuItem Header="_File">
+                <MenuItem Header="_New Project" Command="{Binding NewProjectCommand}"/>
+                <Separator/>
+                <MenuItem Header="_Open Project" Command="{Binding OpenProjectCommand}"/>
+                <MenuItem Header="_Save Project" Command="{Binding SaveProjectCommand}"/>
+                <Separator/>
+                <MenuItem Header="_Export JSON" Command="{Binding ExportJsonCommand}"/>
+            </MenuItem>
+        </Menu>
+
+        <Grid Grid.Row="1" ColumnDefinitions="250, *, 250" Margin="10">
+            
+            <Border Grid.Column="0" Background="#252526" CornerRadius="5" Margin="5">
+                <Grid RowDefinitions="Auto, Auto, *, Auto" Margin="10">
+                    
+                    <StackPanel Grid.Row="0" Spacing="3" Margin="0,0,0,15">
+                        <TextBlock Text="Game Title" FontSize="11" Foreground="DarkGray" FontWeight="SemiBold"/>
+                        <TextBox Watermark="My Visual Novel" Text="{Binding ProjectTitle, Mode=TwoWay}" Background="#1e1e1e" Foreground="White"/>
+                    </StackPanel>
+
+                    <Grid Grid.Row="1" ColumnDefinitions="*, Auto" Margin="0,0,0,10">
+                        <TextBlock Grid.Column="0" Text="Scenes" FontWeight="Bold" Foreground="White" VerticalAlignment="Center"/>
+                        <Button Grid.Column="1" Content="+ New" Command="{Binding AddSceneCommand}" Background="#3e3e42" Foreground="White" FontSize="11" Padding="8,4"/>
+                    </Grid>
+                    
+                    <ListBox Grid.Row="2" ItemsSource="{Binding SceneIds}" SelectedItem="{Binding SelectedSceneId}" Background="#1e1e1e" Foreground="White">
+                        <ListBox.KeyBindings>
+                            <KeyBinding Gesture="Delete" Command="{Binding DeleteSceneCommand}"/>
+                        </ListBox.KeyBindings>
+                        <ListBox.ContextMenu>
+                            <ContextMenu>
+                                <MenuItem Header="Delete Scene" 
+                                          Command="{Binding DeleteSceneCommand}" 
+                                          Foreground="Red"/>
+                            </ContextMenu>
+                        </ListBox.ContextMenu>
+                    </ListBox>
+
+                    <StackPanel Grid.Row="3" Spacing="10" Margin="0,15,0,0">
+                        <Separator Background="#3e3e42" Height="1"/>
+                        <TextBlock Text="Scene Properties" FontWeight="SemiBold" Foreground="Gray" FontSize="11"/>
+                        
+                        <StackPanel Spacing="3">
+                            <TextBlock Text="Background Image" FontSize="10" Foreground="DarkGray"/>
+                            <TextBox Watermark="classroom.png" Text="{Binding CurrentSceneBackground, Mode=TwoWay}" Background="#1e1e1e" Foreground="White"/>
+                        </StackPanel>
+
+                        <StackPanel Spacing="3">
+                            <TextBlock Text="Next Scene" FontSize="10" Foreground="DarkGray"/>
+                            <ComboBox ItemsSource="{Binding SceneIds}" SelectedItem="{Binding CurrentNextSceneId, Mode=TwoWay}" HorizontalAlignment="Stretch" Background="#1e1e1e" Foreground="White"/>
+                        </StackPanel>
+                    </StackPanel>
+                </Grid>
+            </Border>
+
+            <Border Grid.Column="1" Background="#2d2d30" CornerRadius="5" Margin="5">
+                <Grid RowDefinitions="Auto, *, Auto, Auto" Margin="10">
+                    <TextBlock Grid.Row="0" Text="Dialogue Script" FontWeight="Bold" Foreground="White" Margin="0,0,0,10"/>
+                    
+                    <ListBox Grid.Row="1" ItemsSource="{Binding CurrentDialogueLines}" SelectedItem="{Binding SelectedLine, Mode=TwoWay}" Background="#1e1e1e" Margin="0,0,0,10">
+                        <ListBox.KeyBindings>
+                            <KeyBinding Gesture="Delete" Command="{Binding DeleteLineCommand}"/>
+                        </ListBox.KeyBindings>
+                        
+                        <ListBox.ContextMenu>
+                            <ContextMenu>
+                                <MenuItem Header="Delete Line" 
+                                          Command="{Binding DeleteLineCommand}" 
+                                          Foreground="Red"/>
+                            </ContextMenu>
+                        </ListBox.ContextMenu>
+                        <ListBox.ItemTemplate>
+                            <DataTemplate>
+                                <StackPanel Orientation="Horizontal" Spacing="10">
+                                    <TextBlock Text="{Binding Speaker}" FontWeight="Bold" Foreground="#4EC9B0"/>
+                                    <TextBlock Text=":" Foreground="Gray"/>
+                                    <TextBlock Text="{Binding Dialogue}" Foreground="LightGray"/>
+                                </StackPanel>
+                            </DataTemplate>
+                        </ListBox.ItemTemplate>
+                    </ListBox>
+
+                    <StackPanel Grid.Row="2" Spacing="5" Margin="0,5,0,5">
+                        <TextBox Watermark="Speaker Name" 
+                                 Text="{Binding CurrentSpeaker, Mode=TwoWay}" 
+                                 Background="#252526" Foreground="White"/>
+                        
+                        <TextBox Watermark="Dialogue text..." 
+                                 Text="{Binding CurrentDialogue, Mode=TwoWay}" 
+                                 AcceptsReturn="True" Height="60" 
+                                 Background="#252526" Foreground="White"/>
+                    </StackPanel>
+
+                    <Button Grid.Row="3" Content="+ Add Line" Command="{Binding AddLineCommand}" Background="#3e3e42" Foreground="White" HorizontalAlignment="Right"/>
+                </Grid>
+            </Border>
+
+            <Border Grid.Column="2" Background="#252526" CornerRadius="5" Margin="5">
+                <Grid RowDefinitions="Auto, *" Margin="10">
+                    <!-- This header stays perfectly pinned at the top -->
+                    <TextBlock Grid.Row="0" Text="Stage &amp; Audio Manager" FontWeight="Bold" Foreground="White" Margin="0,0,0,10"/>
+                    
+                    <!-- ScrollViewer allows you to scroll all settings below the header -->
+                    <ScrollViewer Grid.Row="1" VerticalScrollBarVisibility="Auto" HorizontalScrollBarVisibility="Disabled">
+                        <StackPanel Spacing="15" Margin="0,10,10,0">
+                            
+                            <!-- Audio Tracks -->
+                            <StackPanel Spacing="5">
+                                <TextBlock Text="Background Music (BGM)" FontSize="12" Foreground="MediumPurple" FontWeight="SemiBold"/>
+                                <TextBox Watermark="classroom_theme.mp3" Text="{Binding CurrentBGM, FallbackValue=''}" Background="#1e1e1e" Foreground="White"/>
+                                <TextBlock Text="*Note: Starts playing on this line. Use 'stop' to end music." 
+                                           FontSize="10" 
+                                           Foreground="Gray" 
+                                           TextWrapping="Wrap" 
+                                           Margin="2,0,0,0"/>
+                                
+                                <TextBlock Text="Sound Effect (SFX)" FontSize="12" Foreground="#4EC9B0" FontWeight="SemiBold" Margin="0,10,0,0"/>
+                                <TextBox Watermark="door_close.wav" Text="{Binding CurrentAudioEffect, FallbackValue=''}" Background="#1e1e1e" Foreground="White"/>
+                                <TextBlock Text="*Note: Plays once on this line." 
+                                           FontSize="10" 
+                                           Foreground="Gray" 
+                                           TextWrapping="Wrap" 
+                                           Margin="2,0,0,0"/>
+                            </StackPanel>
+
+                            <Separator Background="#3e3e42" Height="1"/>
+
+                            <!-- Event CG Override -->
+                            <StackPanel Spacing="5">
+                                <TextBlock Text="Full-Screen CG (Event Art)" FontSize="12" Foreground="Goldenrod" FontWeight="SemiBold"/>
+                                <TextBox Watermark="cg_scene01.png" Text="{Binding CGImage, FallbackValue=''}" Background="#1e1e1e" Foreground="White"/>
+                                <TextBlock Text="*Note: Overrides character sprites when set" 
+                                           FontSize="10" 
+                                           Foreground="Gray" 
+                                           TextWrapping="Wrap" 
+                                           Margin="2,0,0,0"/>
+                            </StackPanel>
+
+                            <Separator Background="#3e3e42" Height="1"/>
+
+                            <!-- Character Sprite Slots -->
+                            <TextBlock Text="Character Sprites on Stage" FontSize="12" Foreground="DeepSkyBlue" FontWeight="SemiBold"/>
+                            
+                            <StackPanel Spacing="10">
+                                <StackPanel Spacing="3">
+                                    <TextBlock Text="Left Slot" FontSize="11" Foreground="DarkGray"/>
+                                    <TextBox Watermark="yuzu_happy.png" Text="{Binding LeftSprite, FallbackValue=''}" Background="#1e1e1e" Foreground="White"/>
+                                </StackPanel>
+
+                                <StackPanel Spacing="3">
+                                    <TextBlock Text="Center Slot" FontSize="11" Foreground="DarkGray"/>
+                                    <TextBox Watermark="kei_neutral.png" Text="{Binding CenterSprite, FallbackValue=''}" Background="#1e1e1e" Foreground="White"/>
+                                </StackPanel>
+
+                                <StackPanel Spacing="3">
+                                    <TextBlock Text="Right Slot" FontSize="11" Foreground="DarkGray"/>
+                                    <TextBox Watermark="arisu_excited.png" Text="{Binding RightSprite, FallbackValue=''}" Background="#1e1e1e" Foreground="White"/>
+                                </StackPanel>
+                            </StackPanel>
+
+                        </StackPanel>
+                    </ScrollViewer>
+                </Grid>
+            </Border>
+
+        </Grid>
+    </Grid>
+</Window>
